@@ -2,12 +2,13 @@
   "name": "chaicode-pr-reviewer",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
+ "scripts": {
+  "dev": "next dev",
+ "build": "prisma generate && next build",
+  "start": "next start",
+  "lint": "eslint",
+  "postinstall": "prisma generate"
+},
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@openrouter/ai-sdk-provider": "^2.9.1",
