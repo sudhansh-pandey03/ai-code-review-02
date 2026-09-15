@@ -44,7 +44,7 @@ export function DashboardSidebar({ user, plan = "Pro" }: DashboardSidebarProps) 
                     />
                   </span>
                   <span className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate font-medium">ChaiCodeAIReview</span>
+                    <span className="truncate font-medium">Suddh-AI-Review</span>
                    
                   </span>
                 </Link>
