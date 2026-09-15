@@ -4,8 +4,13 @@ let pinecone: Pinecone | null = null;
 
 export function getPineconeIndex() {
     if (!pinecone) {
-        pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
+        pinecone = new Pinecone({
+            apiKey: process.env.PINECONE_API_KEY!,
+        });
     }
 
-    return pinecone.index({ name: process.env.PINECONE_INDEX! });
+    return pinecone.index(
+        process.env.PINECONE_INDEX!,
+        process.env.PINECONE_HOST!
+    );
 }
