@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { getSessionCookie } from "better-auth/cookies";
 import { getSafeCallbackPath, SIGN_IN_PATH } from "./index";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -26,11 +27,13 @@ export async function handleAuthProxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = await auth.api.getSession({
-    headers: request.headers,
-  });
-
   if (pathname === SIGN_IN_PATH) {
+    // Full check here (rare page): a cookie-only check could loop between
+    // /sign-in and /dashboard when the cookie exists but the session expired.
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
     if (session) {
       const redirectPath = getPostAuthRedirectPath(request);
       return NextResponse.redirect(new URL(redirectPath, request.url));
@@ -39,7 +42,9 @@ export async function handleAuthProxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (!session) {
+  // Dashboard: only check that a session cookie exists (no database call).
+  // The real session check happens in the dashboard layouts (requireAuth).
+  if (!getSessionCookie(request)) {
     return redirectToSignIn(request, pathname);
   }
 
