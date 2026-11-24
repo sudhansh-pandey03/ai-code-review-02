@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -25,10 +26,15 @@ export async function signInWithGithub(formData: FormData) {
   }
 }
 
-export async function getServerSession() {
+// One session lookup per request: layouts and the page share the result.
+const getCachedSession = cache(async () => {
   return auth.api.getSession({
     headers: await headers(),
   });
+});
+
+export async function getServerSession() {
+  return getCachedSession();
 }
 
 export async function requireAuth(redirectTo = SIGN_IN_PATH) {

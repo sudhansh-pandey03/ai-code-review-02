@@ -16,7 +16,16 @@ export const auth = betterAuth({
         name:profile.name ?? profile.login,
       })
     }, 
-  }, 
+  },
 
-   plugins: [nextCookies()] 
+  // Cache the session in a signed cookie for 5 minutes, so getSession()
+  // doesn't need a database query on every request.
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
+
+   plugins: [nextCookies()]
 });
