@@ -1,11 +1,11 @@
-"use client";
-
+// Server component: the markdown is rendered on the server, so react-markdown
+// never ships to the browser. Collapsible is a client component and still works.
 import { formatDistanceToNow } from "date-fns";
 import {
     ArrowSquareOutIcon,
     CaretDownIcon,
     GitPullRequestIcon,
-} from "@phosphor-icons/react";
+} from "@phosphor-icons/react/dist/ssr";
 
 import {
     Collapsible,

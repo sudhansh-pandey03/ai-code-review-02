@@ -1,10 +1,11 @@
 
 
+import { cache } from "react";
 import type { UserSubscription } from "@/features/dashboard/lib/types";
 import { getRazorpay } from "@/features/billing/lib/razorpay";
 import { prisma } from "@/lib/db";
 
-export async function getUserSubscription(
+async function fetchUserSubscription(
   userId: string
 ): Promise<UserSubscription> {
   const user = await prisma.user.findUnique({
@@ -47,6 +48,10 @@ export async function getUserSubscription(
 
   return { plan: "free", status: "canceled", renewsAt };
 }
+
+// The layout, Settings, Overview and usage all ask for the subscription in
+// the same request; cache() makes that one database query instead of several.
+export const getUserSubscription = cache(fetchUserSubscription);
 
 export async function createProSubscription(userId: string) {
   const subscription = await getUserSubscription(userId);

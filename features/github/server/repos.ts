@@ -1,4 +1,5 @@
 
+import { unstable_cache } from "next/cache";
 import { getGithubApp } from "@/features/github/utils/github-app";
 
 
@@ -64,10 +65,12 @@ function mapRepo(repo: {
 
 const REPOS_PER_PAGE = 100;
 
+// GitHub repo lists change rarely: cache each page for 5 minutes per installation.
+const REPOS_CACHE_SECONDS = 5 * 60;
 
-export async function getInstallationReposPage(
+async function fetchInstallationReposPage(
     installationId: number,
-    page = 1
+    page: number
 ): Promise<InstallationReposPage> {
     const app = getGithubApp();
     // `getInstallationOctokit` exchanges the App JWT for an installation access token.
@@ -86,4 +89,18 @@ export async function getInstallationReposPage(
         page,
         hasMore: page * REPOS_PER_PAGE < totalCount,
     };
+}
+
+// The cache key includes the arguments (installationId, page), so users never share results.
+const getCachedInstallationReposPage = unstable_cache(
+    fetchInstallationReposPage,
+    ["github-installation-repos"],
+    { revalidate: REPOS_CACHE_SECONDS, tags: ["github-repos"] }
+);
+
+export async function getInstallationReposPage(
+    installationId: number,
+    page = 1
+): Promise<InstallationReposPage> {
+    return getCachedInstallationReposPage(installationId, page);
 }
