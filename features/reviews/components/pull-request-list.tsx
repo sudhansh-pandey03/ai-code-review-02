@@ -19,26 +19,9 @@ import {
     EmptyMedia,
     EmptyTitle,
 } from "@/components/ui/empty";
-import { statusBadge, type statusBadgeClass } from "@/features/dashboard/lib/status-style";
-import type {
-    DashboardPullRequest,
-    PullRequestStatus,
-} from "../server/get-pull-requests";
+import { StatusBadge } from "@/features/dashboard/components/status-badge";
+import type { DashboardPullRequest } from "../server/get-pull-requests";
 import { ReviewMarkdown } from "./review-markdown";
-
-const STATUS_DISPLAY: Record<
-    PullRequestStatus,
-    { label: string; tone: keyof typeof statusBadgeClass }
-> = {
-    pending: { label: "Pending", tone: "neutral" },
-    processing: { label: "Reviewing", tone: "info" },
-    reviewed: { label: "Reviewed", tone: "success" },
-    rate_limited: { label: "Limit reached", tone: "warning" },
-};
-
-function getStatusDisplay(status: PullRequestStatus) {
-    return STATUS_DISPLAY[status] ?? STATUS_DISPLAY.pending;
-}
 
 function ReviewBody({ pr }: { pr: DashboardPullRequest }) {
     if (pr.reviewComment) {
@@ -49,6 +32,8 @@ function ReviewBody({ pr }: { pr: DashboardPullRequest }) {
 
     if (pr.status === "pending" || pr.status === "processing") {
         message = "The AI review is in progress. Refresh the page in a minute.";
+    } else if (pr.status === "failed") {
+        message = "The AI review failed. Push a new commit to the PR to try again.";
     } else if (pr.status === "rate_limited") {
         message = "Not reviewed: your plan's review limit was reached.";
     } else if (pr.status === "reviewed") {
@@ -59,7 +44,6 @@ function ReviewBody({ pr }: { pr: DashboardPullRequest }) {
 }
 
 function PullRequestItem({ pr }: { pr: DashboardPullRequest }) {
-    const status = getStatusDisplay(pr.status);
     const updated = formatDistanceToNow(new Date(pr.updatedAt), { addSuffix: true });
 
     return (
@@ -80,7 +64,7 @@ function PullRequestItem({ pr }: { pr: DashboardPullRequest }) {
                 </CollapsibleTrigger>
 
                 <div className="flex shrink-0 items-center gap-2">
-                    <span className={statusBadge(status.tone)}>{status.label}</span>
+                    <StatusBadge kind="pr" status={pr.status} />
                     <a
                         href={pr.githubUrl}
                         target="_blank"
