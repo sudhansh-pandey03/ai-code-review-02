@@ -4,23 +4,25 @@ import { prisma } from "@/lib/db";
 import { UserSettings } from "../types";
 
 export async function getUserSettings(userId: string): Promise<UserSettings> {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        name: true,
-        email: true,
-        image: true,
-        createdAt: true,
-      },
-    });
-  
+    // These three don't depend on each other, so run them at the same time.
+    const [user, subscription, usage] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          name: true,
+          email: true,
+          image: true,
+          createdAt: true,
+        },
+      }),
+      getUserSubscription(userId),
+      getUsageSummary(userId),
+    ]);
+
     if (!user) {
       throw new Error("User not found");
     }
-  
-    const subscription = await getUserSubscription(userId);
-    const usage = await getUsageSummary(userId);
-  
+
     return {
       profile: {
         name: user.name,

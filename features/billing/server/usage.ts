@@ -39,8 +39,10 @@ export async function canUserReview(userId: string): Promise<boolean> {
 }
 
 export async function getUsageSummary(userId: string): Promise<UsageSummary> {
-  const subscription = await getUserSubscription(userId);
-  const used = await getReviewsThisMonth(userId);
+  const [subscription, used] = await Promise.all([
+    getUserSubscription(userId),
+    getReviewsThisMonth(userId),
+  ]);
 
   if (subscription.plan === "pro" && subscription.status === "active") {
     return { used, limit: null };
