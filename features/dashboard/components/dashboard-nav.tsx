@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutIcon ,
   GitBranch,
+  GitPullRequest,
   GithubLogo,
   Gear,
 } from "@phosphor-icons/react";
@@ -25,6 +26,7 @@ import {
 const NAV_ICONS = {
   "layout-dashboard": LayoutIcon ,
   "folder-git-2": GitBranch,
+  "git-pull-request": GitPullRequest,
   github: GithubLogo,
   settings: Gear,
 } as const;
