@@ -5,7 +5,8 @@ export type PullRequestStatus =
     | "pending"
     | "processing"
     | "reviewed"
-    | "rate_limited";
+    | "rate_limited"
+    | "failed";
 
 export type DashboardPullRequest = {
     id: string;

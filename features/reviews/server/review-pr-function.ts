@@ -9,7 +9,25 @@ import { buildRepoNamespace } from "@/features/repo-sync/server/repo-sync";
 
 
 export const reviewPullRequest = inngest.createFunction(
-    { id: "review-pull-request", triggers: { event: "github/pr.received" } },
+    {
+      id: "review-pull-request",
+      triggers: { event: "github/pr.received" },
+      // Runs once all retries are used up, so the PR doesn't stay "processing" forever.
+      onFailure: async ({ event, error }) => {
+        const pullRequestId = event.data.event.data?.pullRequestId;
+
+        if (typeof pullRequestId !== "string") {
+          return;
+        }
+
+        console.error(`Review failed for pull request ${pullRequestId}:`, error.message);
+
+        await prisma.pullRequest.update({
+          where: { id: pullRequestId },
+          data: { status: "failed" },
+        });
+      },
+    },
     async ({ event, step }) => {
       const pullRequestId = event.data.pullRequestId;
   

@@ -38,3 +38,24 @@ export function statusBadge(
     className
   );
 }
+
+export type StatusTone = keyof typeof statusBadgeClass;
+
+/** Pull request review statuses stored in `PullRequest.status`. */
+export const PR_STATUS_DISPLAY: Record<string, { label: string; tone: StatusTone }> = {
+  pending: { label: "Pending", tone: "neutral" },
+  processing: { label: "Reviewing", tone: "info" },
+  reviewed: { label: "Reviewed", tone: "success" },
+  rate_limited: { label: "Limit reached", tone: "warning" },
+  // Set by the onFailure handler in review-pr-function.ts.
+  failed: { label: "Failed", tone: "danger" },
+};
+
+/** Repository sync statuses stored in `RepoSync.status` (null = never synced). */
+export const SYNC_STATUS_DISPLAY: Record<string, { label: string; tone: StatusTone }> = {
+  synced: { label: "Synced", tone: "success" },
+  syncing: { label: "Syncing", tone: "info" },
+  pending: { label: "Syncing", tone: "info" },
+  failed: { label: "Failed", tone: "danger" },
+  none: { label: "Not synced", tone: "neutral" },
+};
